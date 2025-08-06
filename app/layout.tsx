@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { db } from "@/db/index";
+import { usersTable } from "@/db/schema";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -18,6 +19,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  await db.select().from(usersTable);
   return (
     <html lang="en">
       <body className={inter.className}>{children}</body>
