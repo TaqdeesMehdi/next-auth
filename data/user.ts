@@ -4,24 +4,24 @@ import { eq } from "drizzle-orm";
 
 export const getUserByEmail = async (email: string) => {
   try {
-    const user = await db
+    const [user] = await db
       .select()
       .from(usersTable)
       .where(eq(usersTable.email, email));
 
-    return user;
+    return user || null;
   } catch {
     return null;
   }
 };
 export const getUserById = async (id: string) => {
   try {
-    const user = await db
+    const [user] = await db
       .select()
       .from(usersTable)
       .where(eq(usersTable.id, id));
 
-    return user;
+    return user || null;
   } catch {
     return null;
   }

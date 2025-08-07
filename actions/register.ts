@@ -2,7 +2,7 @@
 
 import { z } from "zod";
 import { db } from "@/db";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import { usersTable } from "@/db/schema";
 import { RegisterSchema } from "@/schemas";
 import { getUserByEmail } from "@/data/user";
@@ -15,7 +15,7 @@ export const register = async (values: z.infer<typeof RegisterSchema>) => {
   const { email, password, name } = validatedField.data;
   const hashedPassword = await bcrypt.hash(password, 10);
   const existingUser = await getUserByEmail(email);
-  if (existingUser && existingUser.length > 0) {
+  if (existingUser) {
     return { error: "Email already exist" };
   }
   await db.insert(usersTable).values({
