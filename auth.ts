@@ -3,6 +3,11 @@ import NextAuth, { DefaultSession } from "next-auth";
 import authConfig from "@/auth.config";
 import { DrizzleAdapter } from "@auth/drizzle-adapter";
 import { getUserById } from "./data/user";
+import {
+  accountsTable,
+  usersTable,
+  verificationTokensTable,
+} from "./db/schema";
 export type ExtendedUser = DefaultSession["user"] & {
   role: "ADMIN" | "USER";
 };
@@ -32,7 +37,11 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
       return token;
     },
   },
-  adapter: DrizzleAdapter(db),
+  adapter: DrizzleAdapter(db, {
+    usersTable: usersTable,
+    accountsTable: accountsTable,
+    verificationTokensTable: verificationTokensTable,
+  }),
   session: { strategy: "jwt" },
   ...authConfig,
 });

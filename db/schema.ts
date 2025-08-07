@@ -5,8 +5,8 @@ import {
   integer,
   pgEnum,
   primaryKey,
-  unique,
   uuid,
+  uniqueIndex,
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 
@@ -46,31 +46,20 @@ export const accountsTable = pgTable(
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
   },
-  (table) => {
-    return {
-      // Composite primary key - updated syntax
-      compoundKey: primaryKey({
-        columns: [table.provider, table.providerAccountId],
-      }),
-    };
-  }
+  (table) => [
+    primaryKey({ columns: [table.provider, table.providerAccountId] }),
+  ]
 );
 
 // Verification tokens table - Updated syntax
 export const verificationTokensTable = pgTable(
   "verification_tokens",
   {
-    id: uuid("id").primaryKey().defaultRandom(),
-    email: text("email").notNull(),
-    token: text("token").unique().notNull(),
-    expires: timestamp("expires").notNull(),
+    identifier: text("identifier").notNull(),
+    token: text("token").notNull(),
+    expires: timestamp("expires", { mode: "date" }).notNull(),
   },
-  (table) => {
-    return {
-      // Unique constraint - updated syntax
-      emailTokenIdx: unique().on(table.email, table.token),
-    };
-  }
+  (table) => [primaryKey({ columns: [table.identifier, table.token] })]
 );
 
 // Define relations
