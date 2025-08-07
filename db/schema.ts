@@ -15,7 +15,7 @@ export const userRoleEnum = pgEnum("user_role", ["ADMIN", "USER"]);
 
 // Users table
 export const usersTable = pgTable("users", {
-  id: uuid("id").primaryKey().defaultRandom(), // Using UUID with auto-generation
+  id: uuid("id").primaryKey().defaultRandom(),
   name: text("name"),
   email: text("email").unique().notNull(),
   emailVerified: timestamp("email_verified"),
@@ -26,7 +26,7 @@ export const usersTable = pgTable("users", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
-// Accounts table
+// Accounts table - Updated syntax
 export const accountsTable = pgTable(
   "accounts",
   {
@@ -46,25 +46,31 @@ export const accountsTable = pgTable(
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
   },
-  (table) => ({
-    // Composite primary key
-    pk: primaryKey({ columns: [table.provider, table.providerAccountId] }),
-  })
+  (table) => {
+    return {
+      // Composite primary key - updated syntax
+      compoundKey: primaryKey({
+        columns: [table.provider, table.providerAccountId],
+      }),
+    };
+  }
 );
 
-// Verification tokens table
+// Verification tokens table - Updated syntax
 export const verificationTokensTable = pgTable(
   "verification_tokens",
   {
-    id: uuid("id").primaryKey().defaultRandom(), // Using UUID with auto-generation
+    id: uuid("id").primaryKey().defaultRandom(),
     email: text("email").notNull(),
     token: text("token").unique().notNull(),
     expires: timestamp("expires").notNull(),
   },
-  (table) => ({
-    // Unique constraint on email and token combination
-    emailTokenUnique: unique().on(table.email, table.token),
-  })
+  (table) => {
+    return {
+      // Unique constraint - updated syntax
+      emailTokenIdx: unique().on(table.email, table.token),
+    };
+  }
 );
 
 // Define relations
