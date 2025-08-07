@@ -6,7 +6,6 @@ import {
   pgEnum,
   primaryKey,
   uuid,
-  uniqueIndex,
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 

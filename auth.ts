@@ -35,6 +35,16 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
     },
   },
   callbacks: {
+    async signIn({ user, account }) {
+      if (account?.provider !== "credentials") return true;
+      if (!user.id) {
+        throw new Error("Id Does not exist for this user");
+      }
+      const existingUser = await getUserById(user.id);
+      if (!existingUser?.emailVerified) return false;
+      //TODO: Add 2fa check
+      return true;
+    },
     async session({ token, session }) {
       console.log({ sessionToken: token });
       if (token.sub && session.user) {

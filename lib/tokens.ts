@@ -22,5 +22,5 @@ export const generateVerificationToken = async (email: string) => {
     })
     .returning();
 
-  return verificationToken;
+  return { ...verificationToken, email, token, expires };
 };
