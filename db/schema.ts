@@ -55,11 +55,13 @@ export const accountsTable = pgTable(
 export const verificationTokensTable = pgTable(
   "verification_tokens",
   {
-    identifier: text("identifier").notNull(),
+    identifier: text("identifier").notNull(), // Auth.js expects 'identifier', not 'email'
     token: text("token").notNull(),
     expires: timestamp("expires", { mode: "date" }).notNull(),
   },
-  (table) => [primaryKey({ columns: [table.identifier, table.token] })]
+  (table) => [
+    primaryKey({ columns: [table.identifier, table.token] }), // Composite primary key
+  ]
 );
 
 // Define relations

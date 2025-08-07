@@ -18,7 +18,13 @@ import { login } from "@/actions/login";
 import { LoginSchema } from "@/schemas";
 import { FormError } from "../form-error";
 import { FormSuccess } from "../form-success";
+import { useSearchParams } from "next/navigation";
 export const LoginForm = () => {
+  const searchParams = useSearchParams();
+  const get_url_Error =
+    searchParams.get("error") === "OAuthAccountNotLinked"
+      ? "Email is already in use with different account"
+      : "";
   const [error, setError] = useState<string | undefined>("");
   const [success, setSuccess] = useState<string | undefined>("");
 
@@ -35,8 +41,9 @@ export const LoginForm = () => {
     setSuccess("");
     startTransition(() => {
       login(values).then((data) => {
-        setError(data.error);
-        setSuccess(data.success);
+        setError(data?.error);
+        //TODO: add the success when we do the 2 factor authentication
+        // setSuccess(data?.success);
       });
     });
   };
@@ -89,7 +96,7 @@ export const LoginForm = () => {
               )}
             />
           </div>
-          <FormError message={error} />
+          <FormError message={error || get_url_Error} />
           <FormSuccess message={success} />
           <Button disabled={isPending} type="submit" className="w-full">
             Login

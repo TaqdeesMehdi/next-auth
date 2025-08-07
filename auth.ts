@@ -8,6 +8,7 @@ import {
   usersTable,
   verificationTokensTable,
 } from "./db/schema";
+import { eq } from "drizzle-orm";
 export type ExtendedUser = DefaultSession["user"] & {
   role: "ADMIN" | "USER";
 };
@@ -18,6 +19,21 @@ declare module "next-auth" {
   }
 }
 export const { auth, handlers, signIn, signOut } = NextAuth({
+  pages: {
+    signIn: "/auth/login",
+    error: "/auth/error",
+  },
+  events: {
+    async linkAccount({ user }) {
+      if (!user.id) {
+        throw new Error("User Id is required");
+      }
+      await db
+        .update(usersTable)
+        .set({ emailVerified: new Date() })
+        .where(eq(usersTable.id, user.id));
+    },
+  },
   callbacks: {
     async session({ token, session }) {
       console.log({ sessionToken: token });
