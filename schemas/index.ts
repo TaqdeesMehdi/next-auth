@@ -1,5 +1,11 @@
 import { z } from "zod";
 
+export const NewPasswordSchema = z.object({
+  password: z.string().min(6, {
+    message: "Password is required of at least 6 characters",
+  }),
+});
+
 export const ResetSchema = z.object({
   email: z.string().regex(/^[^\s@]+@[^\s@]+\.[^\s@]+$/, {
     message: "Enter a Valid email",
