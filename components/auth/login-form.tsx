@@ -19,6 +19,7 @@ import { LoginSchema } from "@/schemas";
 import { FormError } from "../form-error";
 import { FormSuccess } from "../form-success";
 import { useSearchParams } from "next/navigation";
+import Link from "next/link";
 export const LoginForm = () => {
   const searchParams = useSearchParams();
   const get_url_Error =
@@ -90,6 +91,14 @@ export const LoginForm = () => {
                       placeholder="******"
                     />
                   </FormControl>
+                  <Button
+                    size="sm"
+                    className="px-0 font-normal"
+                    asChild
+                    variant="link"
+                  >
+                    <Link href="/auth/reset">Forgot password?</Link>
+                  </Button>
                   <FormMessage />
                 </FormItem>
               )}
