@@ -1,4 +1,11 @@
 import { z } from "zod";
+
+export const ResetSchema = z.object({
+  email: z.string().regex(/^[^\s@]+@[^\s@]+\.[^\s@]+$/, {
+    message: "Enter a Valid email",
+  }),
+});
+
 export const LoginSchema = z.object({
   email: z.string().regex(/^[^\s@]+@[^\s@]+\.[^\s@]+$/, {
     message: "Enter a Valid email",

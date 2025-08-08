@@ -63,6 +63,19 @@ export const verificationTokensTable = pgTable(
   ]
 );
 
+// Password reset tokens table - Updated syntax
+export const PasswordResetTokensTable = pgTable(
+  "password_reset_tokens",
+  {
+    identifier: text("identifier").notNull(), // Auth.js expects 'identifier', not 'email'
+    token: text("token").notNull(),
+    expires: timestamp("expires", { mode: "date" }).notNull(),
+  },
+  (table) => [
+    primaryKey({ columns: [table.identifier, table.token] }), // Composite primary key
+  ]
+);
+
 // Define relations
 export const usersRelations = relations(usersTable, ({ many }) => ({
   accounts: many(accountsTable),
