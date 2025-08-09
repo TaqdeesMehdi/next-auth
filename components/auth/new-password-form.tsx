@@ -1,7 +1,10 @@
 "use client";
+import * as z from "zod";
+import { Input } from "../ui/input";
+import { Button } from "../ui/button";
+import { useForm } from "react-hook-form";
 import { CardWrapper } from "./card-wrapper";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
 import {
   Form,
   FormField,
@@ -10,13 +13,10 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import * as z from "zod";
-import { Input } from "../ui/input";
-import { Button } from "../ui/button";
-import { useState, useTransition } from "react";
-import { NewPasswordSchema } from "@/schemas";
 import { FormError } from "../form-error";
 import { FormSuccess } from "../form-success";
+import { NewPasswordSchema } from "@/schemas";
+import { useState, useTransition } from "react";
 import { useSearchParams } from "next/navigation";
 import { newPassword } from "@/actions/new-password";
 export const NewPasswordForm = () => {

@@ -5,12 +5,17 @@ import { DrizzleAdapter } from "@auth/drizzle-adapter";
 import { getUserById } from "./data/user";
 import {
   accountsTable,
+  TwoFactorConfirmationTable,
   usersTable,
   verificationTokensTable,
 } from "./db/schema";
 import { eq } from "drizzle-orm";
+import { getTwoFactorConfirmationByUserId } from "./data/twoFactor-confirmation";
+
+// Update this type to include isTwoFactorEnabled
 export type ExtendedUser = DefaultSession["user"] & {
   role: "ADMIN" | "USER";
+  isTwoFactorEnabled: boolean;
 };
 
 declare module "next-auth" {
@@ -18,6 +23,7 @@ declare module "next-auth" {
     user: ExtendedUser;
   }
 }
+
 export const { auth, handlers, signIn, signOut } = NextAuth({
   pages: {
     signIn: "/auth/login",
@@ -42,7 +48,16 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
       }
       const existingUser = await getUserById(user.id);
       if (!existingUser?.emailVerified) return false;
-      //TODO: Add 2fa check
+      if (existingUser.isTwoFactorEnabled) {
+        const twoFactorConfirmation = await getTwoFactorConfirmationByUserId(
+          existingUser.id
+        );
+        if (!twoFactorConfirmation) return false;
+
+        await db
+          .delete(TwoFactorConfirmationTable)
+          .where(eq(TwoFactorConfirmationTable.id, twoFactorConfirmation.id));
+      }
       return true;
     },
     async session({ token, session }) {
@@ -51,8 +66,17 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         session.user.id = token.sub;
       }
       if (token.role && session.user) {
-        session.user.role = token.role as "ADMIN" | "USER";
+        session.user.role = token.role as "ADMIN" | "USER"; // Fixed this line
       }
+      if (session.user) {
+        session.user.isTwoFactorEnabled = token.isTwoFactorEnabled as boolean;
+      }
+      if (session.user) {
+        session.user.name = token.name;
+        session.user.email = token.email!;
+        session.user.image = token.picture;
+      }
+
       return session;
     },
     async jwt({ token }) {
@@ -60,6 +84,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
       const existingUser = await getUserById(token.sub);
       if (!existingUser) return token;
       token.role = existingUser.role;
+      token.isTwoFactorEnabled = existingUser.isTwoFactorEnabled;
       return token;
     },
   },

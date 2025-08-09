@@ -6,6 +6,8 @@ import {
   pgEnum,
   primaryKey,
   uuid,
+  boolean,
+  unique,
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 
@@ -21,6 +23,7 @@ export const usersTable = pgTable("users", {
   image: text("image"),
   password: text("password"),
   role: userRoleEnum("role").default("USER").notNull(),
+  isTwoFactorEnabled: boolean("2fa").default(false),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
@@ -75,7 +78,30 @@ export const PasswordResetTokensTable = pgTable(
     primaryKey({ columns: [table.identifier, table.token] }), // Composite primary key
   ]
 );
-
+//2 factor authentication table
+export const TwoFactorToken = pgTable(
+  "two_factor_tokens",
+  {
+    identifier: text("identifier").notNull(), // Auth.js expects 'identifier', not 'email'
+    token: text("token").notNull(),
+    expires: timestamp("expires", { mode: "date" }).notNull(),
+  },
+  (table) => [
+    primaryKey({ columns: [table.identifier, table.token] }), // Composite primary key
+  ]
+);
+//2 factor confirmation
+export const TwoFactorConfirmationTable = pgTable(
+  "two_factor_confirmation",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: uuid("user_id")
+      .unique()
+      .notNull()
+      .references(() => usersTable.id, { onDelete: "cascade" }),
+  },
+  (t) => [unique("user_id_unique").on(t.userId)]
+);
 // Define relations
 export const usersRelations = relations(usersTable, ({ many }) => ({
   accounts: many(accountsTable),
