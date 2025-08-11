@@ -13,7 +13,6 @@ import { LogoutButton } from "@/components/auth/logout-button";
 import { FcLeft } from "react-icons/fc";
 export const UserButton = () => {
   const user = useCurrentUser();
-  console.log(user?.image);
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>
